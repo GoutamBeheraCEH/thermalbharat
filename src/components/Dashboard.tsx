@@ -372,9 +372,18 @@ export function AdvisoryCard({ weather }: { weather: WeatherData }) {
 
 // ============== HYDRATION ==============
 export function HydrationPanel({ weather }: { weather: WeatherData }) {
-  const [activity, setActivity] = useState<ActivityLevel>("walking");
-  const [reminders, setReminders] = useState(false);
+  const [activity, setActivity] = usePersistedState<ActivityLevel>("activity", "walking");
+  const [reminders, setReminders] = usePersistedState<boolean>("reminders", false);
   const guide = getHydrationGuide(weather.current.temperature_2m, weather.current.relative_humidity_2m, activity);
+
+  // On mount, if reminders were enabled previously but permission has been
+  // revoked in the browser, sync state back to off.
+  useEffect(() => {
+    if (reminders && typeof Notification !== "undefined" && Notification.permission !== "granted") {
+      setReminders(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function toggleReminders() {
     if (!reminders && typeof Notification !== "undefined") {
@@ -383,6 +392,7 @@ export function HydrationPanel({ weather }: { weather: WeatherData }) {
       setReminders(false);
     }
   }
+
 
   const acts: { k: ActivityLevel; l: string }[] = [
     { k: "resting", l: "Resting" },
