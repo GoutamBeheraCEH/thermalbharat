@@ -211,20 +211,60 @@ export function MobileNav() {
 
 export function Footer() {
   return (
-    <footer className="border-t-2 border-ink bg-parchment mt-12 pb-20 md:pb-0">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 grid md:grid-cols-3 gap-6 text-sm">
-        <div>
-          <div className="font-display font-black text-lg mb-2">ThermalBharat</div>
-          <p className="text-muted-foreground">Hyperlocal heat & weather intelligence for India's cities, towns and villages.</p>
+    <footer className="mt-12 pb-20 md:pb-0 bg-[#1a1a1a] text-[#e8e8e8] border-t-2 border-[#c2591a]">
+      {/* Heat wave SVG divider */}
+      <div className="overflow-hidden h-3 bg-[#1a1a1a]">
+        <svg className="w-full h-3" viewBox="0 0 1200 12" preserveAspectRatio="none" aria-hidden>
+          <path d="M0 6 Q 50 0 100 6 T 200 6 T 300 6 T 400 6 T 500 6 T 600 6 T 700 6 T 800 6 T 900 6 T 1000 6 T 1100 6 T 1200 6"
+            fill="none" stroke="#c2591a" strokeWidth="1.5">
+            <animate attributeName="d"
+              dur="6s" repeatCount="indefinite"
+              values="M0 6 Q 50 0 100 6 T 200 6 T 300 6 T 400 6 T 500 6 T 600 6 T 700 6 T 800 6 T 900 6 T 1000 6 T 1100 6 T 1200 6;
+                      M0 6 Q 50 12 100 6 T 200 6 T 300 6 T 400 6 T 500 6 T 600 6 T 700 6 T 800 6 T 900 6 T 1000 6 T 1100 6 T 1200 6;
+                      M0 6 Q 50 0 100 6 T 200 6 T 300 6 T 400 6 T 500 6 T 600 6 T 700 6 T 800 6 T 900 6 T 1000 6 T 1100 6 T 1200 6" />
+          </path>
+        </svg>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 flex flex-col items-center md:flex-row md:justify-between gap-6 text-center md:text-left">
+        <div className="flex items-center gap-3">
+          <img src="/icons/icon-192.png" alt="ThermalBharat logo" width={40} height={40} loading="lazy" className="w-10 h-10 rounded-md border border-[#c2591a]/40" />
+          <div>
+            <div className="font-display font-black text-lg text-white leading-tight">ThermalBharat</div>
+            <div className="text-xs text-[#888888]">India's Hyperlocal Heat Intelligence Platform</div>
+          </div>
         </div>
-        <div>
-          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-2">Data Sources</div>
-          <p>Open-Meteo • OpenStreetMap (Nominatim) • WAQI</p>
-        </div>
-        <div>
-          <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-2">Disclaimer</div>
-          <p className="text-muted-foreground text-xs">Heat advisories are informational. During heat waves, follow IMD (India Meteorological Department) and local government guidelines.</p>
-        </div>
+
+        <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
+          {[
+            { to: "/", label: "Home" },
+            { to: "/forecast", label: "Forecast" },
+            { to: "/advisory", label: "Advisory" },
+            { to: "/hydration", label: "Hydration" },
+          ].map((l, i) => (
+            <span key={l.to} className="flex items-center gap-4">
+              <Link to={l.to} className="text-[#e8e8e8] hover:text-[#f4a234] transition-colors uppercase tracking-wider text-xs font-medium">
+                {l.label}
+              </Link>
+              {i < 3 && <span className="text-[#444]">|</span>}
+            </span>
+          ))}
+        </nav>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-6 pb-6 space-y-3 text-center">
+        <p className="text-xs text-[#888888] leading-relaxed max-w-3xl mx-auto" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          Data sourced from Open-Meteo & OpenStreetMap. Heat advisories are informational. Follow IMD & local government guidelines during heat waves.
+        </p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#888888" }}>
+          © 2025 ThermalBharat. <span className="text-[#888888]">All Rights Reserved.</span> Developed with <span aria-label="love">❤️</span> by{" "}
+          <a
+            href="#"
+            className="relative inline-block text-[#f4a234] font-semibold after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[1.5px] after:w-full after:bg-[#c2591a] after:scale-x-0 after:origin-left hover:after:scale-x-100 after:transition-transform after:duration-300"
+          >
+            Goutam Behera
+          </a>
+        </p>
       </div>
     </footer>
   );
