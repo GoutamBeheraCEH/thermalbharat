@@ -9,38 +9,105 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HydrationRouteImport } from './routes/hydration'
+import { Route as ForecastRouteImport } from './routes/forecast'
+import { Route as AdvisoryRouteImport } from './routes/advisory'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CityCityNameRouteImport } from './routes/city.$cityName'
 
+const HydrationRoute = HydrationRouteImport.update({
+  id: '/hydration',
+  path: '/hydration',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForecastRoute = ForecastRouteImport.update({
+  id: '/forecast',
+  path: '/forecast',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdvisoryRoute = AdvisoryRouteImport.update({
+  id: '/advisory',
+  path: '/advisory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CityCityNameRoute = CityCityNameRouteImport.update({
+  id: '/city/$cityName',
+  path: '/city/$cityName',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/advisory': typeof AdvisoryRoute
+  '/forecast': typeof ForecastRoute
+  '/hydration': typeof HydrationRoute
+  '/city/$cityName': typeof CityCityNameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/advisory': typeof AdvisoryRoute
+  '/forecast': typeof ForecastRoute
+  '/hydration': typeof HydrationRoute
+  '/city/$cityName': typeof CityCityNameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/advisory': typeof AdvisoryRoute
+  '/forecast': typeof ForecastRoute
+  '/hydration': typeof HydrationRoute
+  '/city/$cityName': typeof CityCityNameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/advisory' | '/forecast' | '/hydration' | '/city/$cityName'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/advisory' | '/forecast' | '/hydration' | '/city/$cityName'
+  id:
+    | '__root__'
+    | '/'
+    | '/advisory'
+    | '/forecast'
+    | '/hydration'
+    | '/city/$cityName'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdvisoryRoute: typeof AdvisoryRoute
+  ForecastRoute: typeof ForecastRoute
+  HydrationRoute: typeof HydrationRoute
+  CityCityNameRoute: typeof CityCityNameRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/hydration': {
+      id: '/hydration'
+      path: '/hydration'
+      fullPath: '/hydration'
+      preLoaderRoute: typeof HydrationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forecast': {
+      id: '/forecast'
+      path: '/forecast'
+      fullPath: '/forecast'
+      preLoaderRoute: typeof ForecastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/advisory': {
+      id: '/advisory'
+      path: '/advisory'
+      fullPath: '/advisory'
+      preLoaderRoute: typeof AdvisoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +115,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/city/$cityName': {
+      id: '/city/$cityName'
+      path: '/city/$cityName'
+      fullPath: '/city/$cityName'
+      preLoaderRoute: typeof CityCityNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdvisoryRoute: AdvisoryRoute,
+  ForecastRoute: ForecastRoute,
+  HydrationRoute: HydrationRoute,
+  CityCityNameRoute: CityCityNameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
