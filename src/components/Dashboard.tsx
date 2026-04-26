@@ -16,7 +16,8 @@ import {
   getHydrationGuide,
   type ActivityLevel,
 } from "@/lib/weather/logic";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePersistedState } from "@/hooks/usePersistedState";
 
 // ============== HERO ==============
 export function HeroHeatCard({
