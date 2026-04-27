@@ -6,4 +6,18 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig();
+const isVercel = process.env.VERCEL === "1" || Boolean(process.env.VERCEL_ENV);
+
+export default defineConfig({
+  cloudflare: isVercel ? false : undefined,
+  tanstackStart: isVercel
+    ? {
+        spa: {
+          enabled: true,
+          prerender: {
+            outputPath: "/index",
+          },
+        },
+      }
+    : undefined,
+});

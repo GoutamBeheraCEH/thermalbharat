@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:vercel": "VERCEL=1 vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -41,6 +42,7 @@
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tailwindcss/vite": "^4.2.1",
+    "@tanstack/query-core": "^5.100.5",
     "@tanstack/react-query": "^5.100.5",
     "@tanstack/react-router": "^1.168.0",
     "@tanstack/react-start": "^1.167.14",
