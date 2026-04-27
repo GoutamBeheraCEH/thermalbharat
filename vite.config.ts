@@ -21,7 +21,3 @@ export default defineConfig({
       }
     : undefined,
 });
-      },
-    },
-  },
-});
