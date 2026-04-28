@@ -1,5 +1,7 @@
 // Weather + geocoding + AQI clients. All public APIs, no auth needed.
 
+import { weatherCache, aqiCache } from "./cache";
+
 export const WAQI_TOKEN = "4c77127f3c590c596756cab369e70a00ef3057a3";
 
 export interface GeoLocation {
@@ -94,7 +96,7 @@ export async function reverseGeocode(lat: number, lon: number): Promise<GeoLocat
   };
 }
 
-import { weatherCache, aqiCache } from "./cache";
+
 
 export async function fetchWeather(lat: number, lon: number): Promise<WeatherData> {
   const params = new URLSearchParams({
@@ -110,9 +112,17 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
     forecast_days: "7",
     timezone: "Asia/Kolkata",
   });
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
-  if (!res.ok) throw new Error("Weather fetch failed");
-  return res.json();
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+    if (!res.ok) throw new Error("Weather fetch failed");
+    const data = (await res.json()) as WeatherData;
+    weatherCache.set(lat, lon, data);
+    return data;
+  } catch (err) {
+    const cached = weatherCache.get(lat, lon);
+    if (cached) return cached.data;
+    throw err;
+  }
 }
 
 export interface AqiData {
@@ -127,20 +137,23 @@ export async function fetchAqi(lat: number, lon: number): Promise<AqiData | null
     const res = await fetch(
       `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${WAQI_TOKEN}`
     );
-    if (!res.ok) return null;
+    if (!res.ok) throw new Error("aqi http");
     const json = (await res.json()) as {
       status: string;
       data?: { aqi: number; dominentpol?: string; city?: { name?: string } };
     };
-    if (json.status !== "ok" || !json.data) return null;
-    return {
+    if (json.status !== "ok" || !json.data) throw new Error("aqi status");
+    const result: AqiData = {
       aqi: json.data.aqi,
       category: aqiCategory(json.data.aqi),
       dominantPollutant: json.data.dominentpol,
       station: json.data.city?.name,
     };
+    aqiCache.set(lat, lon, result);
+    return result;
   } catch {
-    return null;
+    const cached = aqiCache.get(lat, lon);
+    return cached ? cached.data : null;
   }
 }
 
