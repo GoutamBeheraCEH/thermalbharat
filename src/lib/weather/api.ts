@@ -94,6 +94,8 @@ export async function reverseGeocode(lat: number, lon: number): Promise<GeoLocat
   };
 }
 
+import { weatherCache, aqiCache } from "./cache";
+
 export async function fetchWeather(lat: number, lon: number): Promise<WeatherData> {
   const params = new URLSearchParams({
     latitude: lat.toString(),
