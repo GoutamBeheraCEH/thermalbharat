@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { WifiOff, RefreshCw } from "lucide-react";
 import { fetchWeather, fetchAqi, reverseGeocode, type GeoLocation } from "@/lib/weather/api";
+import { lastLocation, weatherCache, formatAge } from "@/lib/weather/cache";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import {
   HeroHeatCard, TodayGrid, HourlyStrip, HistoryChart, WhyHotCard,
   AdvisoryCard, HydrationPanel, ForecastStrip, HeatIndexScale,
@@ -15,35 +18,51 @@ const FALLBACK: GeoLocation = {
 };
 
 interface Props {
-  initialLocation?: GeoLocation; // when provided (city route), skip geolocation
+  initialLocation?: GeoLocation;
 }
 
 export function WeatherDashboard({ initialLocation }: Props) {
-  const [loc, setLoc] = useState<GeoLocation | null>(initialLocation ?? null);
+  const [loc, setLoc] = useState<GeoLocation | null>(
+    initialLocation ?? (typeof window !== "undefined" ? lastLocation.get() : null)
+  );
   const [geoError, setGeoError] = useState<string | null>(null);
+  const online = useOnlineStatus();
 
   useEffect(() => {
-    if (initialLocation) return;
+    if (initialLocation) { lastLocation.set(initialLocation); return; }
     if (typeof navigator === "undefined" || !navigator.geolocation) {
-      setLoc(FALLBACK);
+      if (!loc) setLoc(FALLBACK);
       return;
     }
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
+        // GPS works offline — use coords immediately
+        const coordsLoc: GeoLocation = {
+          name: "Your location",
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          displayName: `${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)}`,
+        };
         try {
           const r = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
           setLoc(r);
+          lastLocation.set(r);
           saveRecent(r);
         } catch {
-          setLoc(FALLBACK);
+          // Offline reverse-geocode failed — use raw GPS
+          setLoc(coordsLoc);
+          lastLocation.set(coordsLoc);
         }
       },
       () => {
-        setGeoError("Location blocked — showing New Delhi");
-        setLoc(FALLBACK);
+        if (!loc) {
+          setGeoError("Location blocked — showing last known");
+          setLoc(lastLocation.get() ?? FALLBACK);
+        }
       },
-      { timeout: 8000 }
+      { timeout: 8000, maximumAge: 5 * 60 * 1000 }
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialLocation]);
 
   const weatherQ = useQuery({
