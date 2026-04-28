@@ -79,16 +79,46 @@ export function WeatherDashboard({ initialLocation }: Props) {
     staleTime: 10 * 60 * 1000,
   });
 
+  // Auto-refresh when network returns
+  useEffect(() => {
+    if (online && loc) {
+      weatherQ.refetch();
+      aqiQ.refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [online]);
+
+  const cached = loc ? weatherCache.get(loc.latitude, loc.longitude) : null;
+  const showingCached = !online && !!weatherQ.data;
+
   return (
     <div className="min-h-screen bg-paper">
       <Header />
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 space-y-8">
+        {!online && (
+          <div className="bg-accent/40 border-2 border-ink shadow-brutal-sm p-3 flex items-center gap-3 text-sm">
+            <WifiOff className="w-4 h-4 shrink-0 text-primary" />
+            <div className="flex-1">
+              <span className="font-bold uppercase tracking-wider text-xs">Offline mode</span>
+              {cached && <span className="ml-2 text-muted-foreground">Last updated {formatAge(cached.ts)}</span>}
+              {!cached && <span className="ml-2 text-muted-foreground">No cached data yet — connect once to download.</span>}
+            </div>
+            <button onClick={() => { weatherQ.refetch(); aqiQ.refetch(); }} className="p-1.5 border-2 border-ink bg-card" aria-label="Retry">
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+        {online && cached && showingCached === false && weatherQ.data && (
+          <></>
+        )}
         {!loc && <ThermometerLoader label="Detecting your location…" />}
-        {loc && weatherQ.isLoading && <ThermometerLoader label={`Fetching heat data for ${loc.name}…`} />}
-        {weatherQ.isError && (
+        {loc && weatherQ.isLoading && !weatherQ.data && <ThermometerLoader label={`Fetching heat data for ${loc.name}…`} />}
+        {weatherQ.isError && !weatherQ.data && (
           <div className="bg-destructive/10 border-2 border-ink shadow-brutal p-6">
             <div className="font-display font-bold text-xl mb-2">Couldn't fetch weather</div>
-            <p className="text-sm text-muted-foreground mb-3">Check your connection and try again.</p>
+            <p className="text-sm text-muted-foreground mb-3">
+              {online ? "Check your connection and try again." : "You're offline and we have no cached data for this location yet."}
+            </p>
             <button onClick={() => weatherQ.refetch()} className="px-4 py-2 bg-primary text-primary-foreground border-2 border-ink shadow-brutal-sm font-bold uppercase text-xs tracking-wider">
               Retry
             </button>
