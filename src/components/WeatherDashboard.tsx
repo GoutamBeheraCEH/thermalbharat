@@ -60,7 +60,7 @@ export function WeatherDashboard({ initialLocation }: Props) {
           setLoc(lastLocation.get() ?? FALLBACK);
         }
       },
-      { timeout: 8000, maximumAge: 5 * 60 * 1000 }
+      { timeout: 15000, maximumAge: 2 * 60 * 1000, enableHighAccuracy: true }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialLocation]);
