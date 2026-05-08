@@ -111,6 +111,8 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
     past_days: "7",
     forecast_days: "7",
     timezone: "Asia/Kolkata",
+    models: "best_match",
+    cell_selection: "nearest",
   });
   try {
     const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
